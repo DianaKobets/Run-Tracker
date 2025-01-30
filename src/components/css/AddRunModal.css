@@ -1,0 +1,61 @@
+.add-run-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.add-run-modal {
+  background-color: rgb(15 23 42);
+  border-radius: 0.5rem; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  padding: 1.5rem; 
+  width: 100%;
+  max-width: 28rem; 
+  position: relative;
+}
+
+.add-run-modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  color: #6b7280; 
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.add-run-modal-close:hover {
+  color: rgb(203 213 225);
+}
+
+.add-run-modal label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.add-run-modal input {
+  background-color: rgb(30 41 59);
+  border: 1px solid transparent; 
+  border-radius: 0.375rem; 
+  padding: 0.5rem;
+  width: 100%;
+  margin-top: 0.25rem;
+  box-sizing: border-box;
+}
+
+.add-run-modal-button {
+  background-color: rgb(2 6 23);
+  color: white;
+  border-radius: 0.375rem; 
+  padding: 0.5rem 1rem;
+  width: 100%;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.add-run-modal-button:hover {
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
