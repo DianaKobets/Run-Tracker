@@ -1,115 +1,77 @@
-//import { createClient } from "@supabase/supabase-js";
-import supabase from "../storage/supabase.js";
+import { db } from "../firebase/firebase.js";
+import { collection, onSnapshot } from "firebase/firestore";
 import { Chart, LinearScale, CategoryScale, Title, Tooltip, Legend, LineController, PointElement, LineElement } from "chart.js";
 import { useState, useEffect, useRef } from "react";
+import './css/Statistics.css'
 
 Chart.register(LinearScale, CategoryScale, Title, Tooltip, Legend, LineController, PointElement, LineElement);
 
 export function Statistics() {
-    const canvasRefTime = useRef(null); 
-    const canvasRefDistance = useRef(null);  
+    const canvasRefTime = useRef(null);
+    const canvasRefDistance = useRef(null);
     const [runs, setRuns] = useState([]);
-    const [chartTime, setChartTime] = useState(null); 
-    const [chartDistance, setChartDistance] = useState(null); 
+    const chartTimeRef = useRef(null);
+    const chartDistanceRef = useRef(null);
+
     useEffect(() => {
-        getData();
+        const unsubscribe = onSnapshot(collection(db, "runs"), (querySnapshot) => {
+            const runsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            setRuns(runsData);
+        });
+
+        return () => unsubscribe(); // Отписка при размонтировании компонента
     }, []);
 
     useEffect(() => {
-
         if (runs.length > 0) {
-            if (chartTime) {
-                chartTime.destroy();
-            }
-            const newChartTime = new Chart(canvasRefTime.current, {
-                type: 'line',
-                data: {
-                    labels: runs.map(run => {
-                        const date = new Date(run.date);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0'); 
-                        return `${day}-${month}`;
-                    }),
-                    datasets: [{
-                        label: "Длительность пробежек",
-                        data: runs.map(run => run.time),
-                        borderColor: 'green', 
-                        backgroundColor: 'rgba(0, 128, 0, 0.1)', 
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            type: 'linear',
-                        },
-                        x: {
-                            type: 'category'
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                    }
-                }
+            const labels = runs.map(run => {
+                const date = new Date(run.date.toDate());
+                return `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}`;
             });
-            setChartTime(newChartTime); 
-            if (chartDistance) {
-                chartDistance.destroy();
-            }
-            const newChartDistance = new Chart(canvasRefDistance.current, {
-                type: 'line',
-                data: {
-                    labels: runs.map(run => {
-                        const date = new Date(run.date);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0'); 
-                        return `${day}-${month}`;
-                    }),
-                    datasets: [{
-                        label: "Дистанция пробежек",
-                        data: runs.map(run => run.distance),
-                        borderColor: 'blue', 
-                        backgroundColor: 'rgba(0, 0, 255, 0.1)', 
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            type: 'linear',
-                        },
-                        x: {
-                            type: 'category'
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                    }
+
+            const createChart = (canvasRef, chartRef, label, data, color) => {
+                if (chartRef.current) {
+                    chartRef.current.destroy();
                 }
-                
-            });
-            setChartDistance(newChartDistance); 
+                chartRef.current = new Chart(canvasRef.current, {
+                    type: "line",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label,
+                            data,
+                            borderColor: color,
+                            backgroundColor: `${color}33`, // Цвет с прозрачностью
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { type: "linear" },
+                            x: { type: "category" }
+                        },
+                        plugins: { legend: { position: "top" } }
+                    }
+                });
+            };
+
+            createChart(canvasRefTime, chartTimeRef, "Длительность пробежек", runs.map(run => run.time), "green");
+            createChart(canvasRefDistance, chartDistanceRef, "Дистанция пробежек", runs.map(run => run.distance), "blue");
         }
     }, [runs]);
 
-
-    async function getData() {
-        const { data } = await supabase.from("runs").select();
-        setRuns(data); 
-    }
-
     return (
-        <div className="flex flex-col m-10 px-10">
+        <div className="charts-container">
             <h3>График длительности пробежек</h3>
-            <div style={{ position: 'relative', height: '250px', width: '600px' }}>
+            <div className="chart">
                 <canvas ref={canvasRefTime} />
             </div>
             <h3>График дистанции пробежек</h3>
-            <div style={{ position: 'relative', height: '250px', width: '600px' }}>
+            <div className="chart">
                 <canvas ref={canvasRefDistance} />
             </div>
         </div>

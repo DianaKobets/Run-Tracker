@@ -1,0 +1,62 @@
+.main-container{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: max-content;
+    padding: 0 2.5rem;
+}
+.profile-container{
+    display: flex;
+    flex-direction: row;
+    height: 30%;
+    width: 42%;
+    border-radius: 40px;
+    padding: 2% 2%;
+    gap: 7%;
+    margin-top: 2%;
+}
+
+.profile-container img{
+    width: 60%;
+    border-radius: 50px;
+}
+
+.profile-container h1{
+    font-size: 1.7rem;
+    letter-spacing: .1rem;
+}
+
+.first-column{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width: 50%;
+}
+
+.first-column > p{
+   width: 100%;
+   margin-top: -15px;
+   margin-bottom: 25px;
+   font-size: 1rem;
+}
+
+.second-column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.second-column > p{
+    padding: 2% 10%;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 20px;
+    width: fit-content;
+    font-size: 1rem;
+    letter-spacing: .05rem;
+}
+
+.second-column > button{
+    width: 100%;
+    border-radius: 20px;
+}

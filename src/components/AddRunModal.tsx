@@ -1,12 +1,12 @@
-//import { createClient } from "@supabase/supabase-js";
-import supabase from "../storage/supabase.js";
+import { db } from '../firebase/firebase.js'
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { useState } from "react";
 import './css/AddRunModal.css'
 
 export function AddRunModal({isOpen, onClose, email} : {isOpen: boolean; onClose: ()=> void; email: string }){
     const [time, setTime] = useState(""); // Время пробежки
     const [distance, setDistance] = useState(""); // Дистанция пробежки
-    const currentDate = new Date().toISOString();
+    const currentDate = Timestamp.now();
   
     const handleSubmit = async () => {
       if (!time || !distance) {
@@ -14,20 +14,18 @@ export function AddRunModal({isOpen, onClose, email} : {isOpen: boolean; onClose
         return;
       }
       try {
-        const { data, error } = await supabase.from("runs").insert([
-          { email: email, time, distance, date: currentDate },
-        ]);
-  
-        if (error) {
-          console.log("Ошибка добавления пробежки: ", error.message);
-          alert("Не удалось добавить пробежку, проверьте введенные данные");
-        } else {
+        const runsCollection = collection(db, "runs");
+        await addDoc(runsCollection, {
+          date: currentDate, 
+          distance: parseFloat(distance), 
+          time: parseFloat(time), 
+          email
+        });
+
           alert("Пробежка успешно добавлена!");
-          console.log("Добавлено: ", data);
           setDistance("");
           setTime("");
           onClose();
-        }
       } catch (err) {
         console.log("Ошибка выполнения запроса: ", err);
         alert("Произошла ошибка, попробуйте еще раз");
